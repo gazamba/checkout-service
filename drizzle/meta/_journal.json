@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1779896683652,
+      "tag": "0000_illegal_tinkerer",
+      "breakpoints": true
+    }
+  ]
+}
