@@ -26,6 +26,21 @@ export const auth = betterAuth({
     enabled: true,
   },
 
+  account: {
+    accountLinking: {
+      enabled: true,
+      // Auto-link a social login to an existing user with the same email.
+      // GitHub is trusted because it only returns verified emails, which proves
+      // the GitHub user owns the address.
+      trustedProviders: ["github"],
+      // This app has no email-verification flow, so email/password accounts have
+      // emailVerified=false. Without this, Better Auth would refuse to link a
+      // GitHub login to them (account_not_linked). Safe here because the trusted
+      // provider already verified the email; revisit if email verification is added.
+      requireLocalEmailVerified: false,
+    },
+  },
+
   socialProviders: githubConfigured
     ? {
         github: {
