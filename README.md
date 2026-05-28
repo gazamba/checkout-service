@@ -4,6 +4,8 @@ A small, authenticated checkout calculator built with the Next.js App Router.
 Given a list of line items it computes subtotal, taxes, and an optional discount,
 persists every calculation, and returns the totals as JSON.
 
+**Live demo:** https://checkout-service-seven.vercel.app
+
 ## Stack
 
 - **Next.js** (App Router) + **TypeScript**
