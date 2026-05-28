@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { auth } from "./auth";
 
 /**
- * Shape returned to `useActionState` in the UI (Phase 5). `undefined` means
+ * Shape returned to `useActionState` in the UI. `undefined` means
  * "no error yet"; a populated `error` is rendered next to the form.
  */
 export type AuthActionState = { error: string } | undefined;
