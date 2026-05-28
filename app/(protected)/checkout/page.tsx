@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 
-import { Button } from "@/components/ui/button";
 import { CheckoutForm } from "@/features/checkout/components/checkout-form";
-import { signOutAction } from "@/features/auth/actions";
+import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { getSession } from "@/features/auth/session";
 
 export const metadata: Metadata = {
@@ -20,11 +19,7 @@ export default async function CheckoutPage() {
         <span className="text-sm font-semibold">Checkout Service</span>
         <div className="flex items-center gap-3 text-sm">
           <span className="text-muted-foreground">{session?.user.email}</span>
-          <form action={signOutAction}>
-            <Button type="submit" variant="outline" size="sm">
-              Sign out
-            </Button>
-          </form>
+          <SignOutButton />
         </div>
       </header>
 

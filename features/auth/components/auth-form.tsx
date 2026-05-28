@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +42,14 @@ export function AuthForm({
     isSignup ? signUpAction : signInAction,
     undefined,
   );
+
+  // Surface auth errors as a toast (they don't redirect, so they're visible on
+  // this page); the inline message below stays for accessibility.
+  useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state]);
 
   return (
     <Card className="w-full max-w-sm">

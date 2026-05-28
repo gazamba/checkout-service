@@ -97,7 +97,8 @@ export async function signInWithGithubAction(): Promise<AuthActionState> {
   redirect(url);
 }
 
+// Signs the user out. Navigation + the toast are handled client-side by
+// SignOutButton, so this just clears the session (no redirect).
 export async function signOutAction(): Promise<void> {
   await auth.api.signOut({ headers: await headers() });
-  redirect("/signin");
 }
