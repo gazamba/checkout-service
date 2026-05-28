@@ -13,21 +13,7 @@
  *   total    = subtotal + taxes - discount
  */
 
-export interface CheckoutItemInput {
-  name: string;
-  /** Price per unit, in dollars (e.g. 10.99). */
-  unitPrice: number;
-  /** Whole number of units, >= 1. */
-  quantity: number;
-}
-
-export interface CheckoutTotals {
-  /** All values are integer cents. */
-  subtotal: number;
-  taxes: number;
-  discount: number;
-  total: number;
-}
+import type { CheckoutItemInput, CheckoutTotals } from "./types";
 
 const TAX_RATE_BPS = 1300; // 13.00%, in basis points
 const DISCOUNT_RATE_BPS = 1000; // 10.00%, in basis points

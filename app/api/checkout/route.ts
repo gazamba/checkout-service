@@ -1,32 +1,13 @@
-import { z } from "zod";
-
 import { db } from "@/db";
 import { checkout, checkoutItem } from "@/db/schema";
 import {
   calculateCheckout,
   toCents,
   toResponseAmounts,
-  type CheckoutItemInput,
-} from "@/lib/checkout";
+} from "@/features/checkout/calculate";
+import type { CheckoutItemInput } from "@/features/checkout/types";
+import { checkoutBodySchema } from "@/features/checkout/validation";
 import { getSession } from "@/lib/session";
-
-// Validation: items is a non-empty array; each item has a non-empty name,
-// a finite unit_price >= 0, and an integer quantity >= 1.
-const itemSchema = z.object({
-  name: z.string().trim().min(1, "name must be a non-empty string"),
-  unit_price: z
-    .number({ message: "unit_price must be a number" })
-    .finite("unit_price must be a finite number")
-    .min(0, "unit_price must be >= 0"),
-  quantity: z
-    .number({ message: "quantity must be a number" })
-    .int("quantity must be an integer")
-    .min(1, "quantity must be >= 1"),
-});
-
-const bodySchema = z.object({
-  items: z.array(itemSchema).min(1, "items must be a non-empty array"),
-});
 
 export async function POST(request: Request) {
   // 1. Authentication — reject unauthenticated requests.
@@ -43,7 +24,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Request body must be valid JSON" }, { status: 400 });
   }
 
-  const parsed = bodySchema.safeParse(json);
+  const parsed = checkoutBodySchema.safeParse(json);
   if (!parsed.success) {
     const issues = parsed.error.issues.map((issue) => ({
       path: issue.path.join(".") || "(root)",

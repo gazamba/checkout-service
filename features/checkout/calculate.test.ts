@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  type CheckoutItemInput,
   calculateCheckout,
   toAmount,
   toCents,
   toResponseAmounts,
-} from "./checkout";
+} from "./calculate";
+import type { CheckoutItemInput } from "./types";
 
 const item = (
   unitPrice: number,
