@@ -134,7 +134,7 @@ curl -s -b cookies.txt -X POST http://localhost:3000/api/checkout \
 **Other responses**
 
 - `401 Unauthorized` — `{"error":"Unauthorized"}` when there is no valid session.
-- `400 Bad Request` — `{"error":"Invalid request body","issues":[{"path":"items.0.unit_price","message":"unit_price must be >= 0"}]}` on invalid input.
+- `400 Bad Request` — `{"error":"Invalid request body","issues":[{"path":"items.0.unit_price","message":"Unit price can't be negative"}]}` on invalid input. (The UI surfaces each issue per row, e.g. "Item 1 — Unit price can't be negative".)
 
 ## Authentication & route protection
 
@@ -186,7 +186,7 @@ app/
   page.tsx                     redirects / -> /checkout
 features/
   auth/                        auth.ts, actions.ts, session.ts, schema.ts,
-                               components/auth-form.tsx
+                               components/ (auth-form, sign-out-button)
   checkout/                    calculate.ts (+ calculate.test.ts), validation.ts,
                                types.ts, schema.ts, components/checkout-form.tsx
 db/
