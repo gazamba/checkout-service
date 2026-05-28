@@ -60,7 +60,14 @@ export function CheckoutForm() {
         if (Array.isArray(data.issues) && data.issues.length > 0) {
           setError(
             data.issues
-              .map((i: { path: string; message: string }) => `${i.path}: ${i.message}`)
+              .map((i: { path: string; message: string }) => {
+                // "Item N — <message>" for per-row issues; the validation
+                // messages already lead with the field label (e.g. "Name is required").
+                const parts = i.path.split(".");
+                return parts[0] === "items" && parts.length >= 3
+                  ? `Item ${Number(parts[1]) + 1} — ${i.message}`
+                  : i.message;
+              })
               .join("; "),
           );
         } else {
