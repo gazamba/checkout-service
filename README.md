@@ -18,7 +18,7 @@ persists every calculation, and returns the totals as JSON.
 
 ## Business logic
 
-Implemented as a pure, side-effect-free function in [`lib/checkout.ts`](lib/checkout.ts).
+Implemented as a pure, side-effect-free function in [`features/checkout/calculate.ts`](features/checkout/calculate.ts).
 All money is computed in **integer cents** to avoid floating-point drift.
 
 ```
@@ -72,7 +72,7 @@ only shown when both GitHub variables are set.
 
 ## Database migrations (Drizzle)
 
-The schema lives in [`db/schema.ts`](db/schema.ts); generated SQL migrations live in `drizzle/`.
+The schema lives in [`db/schema.ts`](db/schema.ts) (a re-export of the per-feature schemas); generated SQL migrations live in `db/drizzle/`.
 
 ```bash
 pnpm db:generate   # generate a new migration from schema changes (offline, no DB needed)
@@ -140,12 +140,12 @@ curl -s -b cookies.txt -X POST http://localhost:3000/api/checkout \
 
 Defense in depth, with two layers:
 
-1. **Secure (the real boundary):** the `/checkout` page reads the session
-   server-side (`getSession()`) and redirects to `/signin` if missing, and
-   `POST /api/checkout` returns `401` without a valid session.
+1. **Secure (the real boundary):** `app/(protected)/layout.tsx` reads the
+   session server-side (`getSession()`) and redirects to `/signin` if missing,
+   and `POST /api/checkout` returns `401` without a valid session.
 2. **Optimistic (UX only):** [`proxy.ts`](proxy.ts) (Next.js 16's renamed
-   Middleware) does a fast, cookie-only redirect for `/checkout` and `/signin`.
-   It never hits the database and is **not** relied on for security.
+   Middleware) does a fast, cookie-only redirect for `/checkout`, `/signin`, and
+   `/signup`. It never hits the database and is **not** relied on for security.
 
 ## How the design satisfies the distributed-architecture requirement
 
@@ -162,7 +162,7 @@ scales horizontally with no sticky sessions:
   travels with each request and is validated against the database.
 - **Stateless edge routing.** `proxy.ts` only inspects the request cookie — no
   shared state, no DB.
-- **Pure business logic.** `lib/checkout.ts` has no I/O, so the calculation is
+- **Pure business logic.** `features/checkout/calculate.ts` has no I/O, so the calculation is
   deterministic and trivially parallelizable.
 - **Atomic persistence without interactive transactions.** Because the HTTP
   driver has no interactive transactions, the route generates the checkout id up
@@ -173,21 +173,27 @@ scales horizontally with no sticky sessions:
 
 ```
 app/
-  api/auth/[...all]/route.ts   Better Auth catch-all (OAuth callbacks, session)
-  api/checkout/route.ts        POST /api/checkout
-  checkout/page.tsx            auth-gated checkout UI
-  signin/page.tsx              sign in / sign up
-components/
-  auth-form.tsx, checkout-form.tsx
-  ui/                          shadcn/ui components
+  (auth)/                      auth pages + shared "redirect if signed in" layout
+    layout.tsx                 redirects authenticated users to /checkout
+    signin/page.tsx            /signin
+    signup/page.tsx            /signup
+  (protected)/                 auth-gated pages + shared session guard
+    layout.tsx                 getSession() -> redirect to /signin if missing
+    checkout/page.tsx          /checkout (route groups add no URL segment)
+  api/
+    auth/[...all]/route.ts     Better Auth catch-all (OAuth callbacks, session)
+    checkout/route.ts          POST /api/checkout
+  page.tsx                     redirects / -> /checkout
+features/
+  auth/                        auth.ts, actions.ts, session.ts, schema.ts,
+                               components/auth-form.tsx
+  checkout/                    calculate.ts (+ calculate.test.ts), validation.ts,
+                               types.ts, schema.ts, components/checkout-form.tsx
 db/
-  schema.ts                    Drizzle schema (Better Auth + checkout tables)
-  index.ts                     Neon serverless Drizzle client
-drizzle/                       generated SQL migrations
-lib/
-  auth.ts                      Better Auth config
-  auth-actions.ts              sign up / in / out server actions
-  checkout.ts                  pure checkout calculation (+ tests)
-  session.ts                   server-side session helper
+  index.ts                     Neon serverless (HTTP) Drizzle client
+  schema.ts                    re-export aggregator (features/*/schema.ts)
+  drizzle/                     generated SQL migrations
+components/ui/                  shared shadcn/ui primitives
+lib/utils.ts                   cross-cutting helpers (cn)
 proxy.ts                       optimistic, cookie-only auth routing
 ```
