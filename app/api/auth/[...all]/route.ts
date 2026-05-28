@@ -1,6 +1,6 @@
 import { toNextJsHandler } from "better-auth/next-js";
 
-import { auth } from "@/lib/auth";
+import { auth } from "@/features/auth/auth";
 
 // Better Auth's catch-all endpoint. Handles the OAuth callback
 // (/api/auth/callback/github), the client session endpoint, etc. This is

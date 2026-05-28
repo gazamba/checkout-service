@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { CheckoutForm } from "@/components/checkout-form";
-import { signOutAction } from "@/lib/auth-actions";
-import { getSession } from "@/lib/session";
+import { signOutAction } from "@/features/auth/actions";
+import { getSession } from "@/features/auth/session";
 
 export const metadata: Metadata = {
   title: "Checkout · Checkout Service",

@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 
-import { auth } from "@/lib/auth";
+import { auth } from "./auth";
 
 /**
  * Reads the current Better Auth session on the server (Server Components,

@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { signInAction, signInWithGithubAction, signUpAction } from "@/lib/auth-actions";
+import { signInAction, signInWithGithubAction, signUpAction } from "@/features/auth/actions";
 
 type Mode = "signin" | "signup";
 

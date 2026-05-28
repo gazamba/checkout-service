@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthForm } from "@/components/auth-form";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/features/auth/session";
 
 export const metadata: Metadata = {
   title: "Sign up · Checkout Service",

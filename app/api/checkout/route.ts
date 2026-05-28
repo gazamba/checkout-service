@@ -7,7 +7,7 @@ import {
 } from "@/features/checkout/calculate";
 import type { CheckoutItemInput } from "@/features/checkout/types";
 import { checkoutBodySchema } from "@/features/checkout/validation";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/features/auth/session";
 
 export async function POST(request: Request) {
   // 1. Authentication — reject unauthenticated requests.
