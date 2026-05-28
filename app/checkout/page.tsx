@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { CheckoutForm } from "@/components/checkout-form";
+import { CheckoutForm } from "@/features/checkout/components/checkout-form";
 import { signOutAction } from "@/features/auth/actions";
 import { getSession } from "@/features/auth/session";
 
