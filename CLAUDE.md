@@ -29,19 +29,30 @@ architecture**. A bonus UI is included.
 
 ## Key files
 
-- `lib/checkout.ts` — **pure** calc in integer cents (+ `lib/checkout.test.ts`).
-- `app/api/checkout/route.ts` — `POST /api/checkout`: session 401 → Zod 400 →
-  calc → atomic `db.batch` persist → `201` with 2-decimal numbers.
-- `lib/auth.ts` (Better Auth config), `db/index.ts` (Neon HTTP Drizzle client),
-  `db/schema.ts` (schema), `lib/auth-actions.ts` (server actions),
-  `lib/session.ts` (`getSession` helper).
-- `app/signin` + `app/signup` (separate pages, cross-linked), `app/checkout`
-  (auth-gated UI), `proxy.ts` (optimistic cookie-only auth redirects).
+Feature-based layout: domain code lives under `features/<feature>/`; `app/` is a
+thin routing layer; `db/` holds the Drizzle client + a schema aggregator.
+
+- **features/checkout/** — `calculate.ts` (pure calc in integer cents) +
+  `calculate.test.ts`, `validation.ts` (Zod request schema), `types.ts`,
+  `schema.ts` (checkout + checkout_item tables), `components/checkout-form.tsx`.
+- **features/auth/** — `auth.ts` (Better Auth config), `actions.ts` (sign
+  up/in/out server actions), `session.ts` (`getSession` helper), `schema.ts`
+  (user/session/account/verification), `components/auth-form.tsx`.
+- **app/** — `api/checkout/route.ts` (`POST /api/checkout`: 401 → Zod 400 → calc
+  → atomic `db.batch` persist → `201`), `api/auth/[...all]/route.ts` (Better Auth
+  catch-all), `(protected)/layout.tsx` (session-guard layout),
+  `(protected)/checkout/page.tsx` (gated UI, URL stays `/checkout`), `signin/` +
+  `signup/` (cross-linked auth pages), `page.tsx` (redirects to `/checkout`).
+- **db/** — `index.ts` (Neon HTTP Drizzle client), `schema.ts` (re-export
+  aggregator → `features/*/schema.ts`).
+- **lib/** — cross-cutting only: `utils.ts` (`cn`). **`proxy.ts`** (root) is the
+  optimistic cookie-only auth redirect.
 
 ## Money model — intentional, do NOT "fix"
 
 - Compute and store in **integer cents**; convert dollars↔cents only at the
-  edges (`toCents`/`toAmount` in `lib/checkout.ts`). Money DB columns are `integer`.
+  edges (`toCents`/`toAmount` in `features/checkout/calculate.ts`). Money DB
+  columns are `integer`.
 - `taxes = 13%` of the **full** subtotal (before discount).
 - `discount = 10%` only when subtotal is **strictly > $100.00** (10000 cents);
   exactly $100.00 → no discount.
@@ -55,8 +66,9 @@ architecture**. A bonus UI is included.
 - **Better Auth + Drizzle schema rules:** export tables under singular model
   names (`user`/`session`/`account`/`verification`); object **property keys**
   must equal Better Auth's camelCase field names; SQL column names are snake_case.
-- **Security boundary is server-side** (`getSession()` in pages, `401` in the
-  API). `proxy.ts` is **optimistic only** (cookie presence), never the boundary.
+- **Security boundary is server-side** — `app/(protected)/layout.tsx` runs
+  `getSession()` and redirects unauthenticated UI requests; the API route returns
+  `401`. `proxy.ts` is **optimistic only** (cookie presence), never the boundary.
 - **GitHub account linking** is enabled with `requireLocalEmailVerified: false`
   (this MVP has no email-verification flow) so GitHub logins merge into an
   existing same-email account. Revisit if email verification is ever added.
